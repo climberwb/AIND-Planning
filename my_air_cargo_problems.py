@@ -241,7 +241,8 @@ class AirCargoProblem(Problem):
                     counts.append(count)
                     count = 0
                     continue
-        count = sorted(counts)[0]
+        if len(counts) > 0:
+            count = sorted(counts)[0]
         return count
 
 
