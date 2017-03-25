@@ -3,6 +3,8 @@ import sys
 
 parent = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(os.path.dirname(parent), "aimacode"))
+sys.path.append('/home/ubuntu/workspace/AIND-Planning')
+sys.path.append('/Users/warren/code/AIND-Planning')
 import unittest
 from aimacode.utils import expr
 from aimacode.planning import Action

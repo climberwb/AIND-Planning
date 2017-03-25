@@ -308,9 +308,53 @@ class PlanningGraph():
         # 1. determine what actions to add and create those PgNode_a objects
         # 2. connect the nodes to the previous S literal level
         # for example, the A0 level will iterate through all possible actions for the problem and add a PgNode_a to a_levels[0]
-        #   set iff all prerequisite literals for the action hold in S0.  This can be accomplished by testing
+        #   set if all prerequisite literals for the action hold in S0.  This can be accomplished by testing
         #   to see if a proposed PgNode_a has prenodes that are a subset of the previous S level.  Once an
         #   action node is added, it MUST be connected to the S node instances in the appropriate s_level set.
+
+        # print(self.problem)
+        # print('in add_action_level!!', level, self.all_actions)
+        # print( [(s.is_pos, s.symbol) for s in self.s_levels[level]])
+        # print((self.all_actions[0].precond_pos,self.all_actions[0].precond_neg))
+
+        # print('\n\n')
+        s_pos = set()
+        s_neg = set()
+        for s in self.s_levels[level]:
+            if s.is_pos:
+                s_pos.add(s.symbol)
+            else:
+                s_neg.add(s.symbol)
+        # print(s_pos,s_neg, s.children,s.parents)
+        actions = set()
+        for action in self.all_actions:
+            
+                n = PgNode_a(action)
+                print('tests',n.prenodes, self.s_levels[level])
+                for s in self.s_levels[level]:
+                    print(type(s))
+                    if n.prenodes-self.s_levels[level] == set():
+                        actions.add(n)
+                        if (s.symbol in action.precond_pos and s.is_pos) or (s.symbol in action.precond_neg and s.is_pos==False):
+                            s.children.add(n)
+        
+
+        if len(self.a_levels)==0:
+            self.a_levels.append(set())
+        self.a_levels[level] = actions
+        print('action levels',len(self.a_levels))
+        print('s levels',len(self.s_levels))
+        print(level)
+        print('\n')
+        #     print(n.parents,n.children, 'df')
+        # print('\n\n')
+        
+
+
+
+ 
+
+
 
     def add_literal_level(self, level):
         ''' add an S (literal) level to the Planning Graph
@@ -355,7 +399,7 @@ class PlanningGraph():
                     mutexify(n1, n2)
 
     def serialize_actions(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
-        '''
+        """
         Test a pair of actions for mutual exclusion, returning True if the
         planning graph is serial, and if either action is persistent; otherwise
         return False.  Two serial actions are mutually exclusive if they are
@@ -364,7 +408,7 @@ class PlanningGraph():
         :param node_a1: PgNode_a
         :param node_a2: PgNode_a
         :return: bool
-        '''
+        """
         #
         if not self.serial:
             return False
