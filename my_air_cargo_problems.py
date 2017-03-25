@@ -178,7 +178,6 @@ class AirCargoProblem(Problem):
                 new_state.neg.append(fluent)
         return encode_state(new_state, self.state_map)
 
-        return encode_state(new_state, self.state_map)
 
     def goal_test(self, state: str) -> bool:
         """ Test the state to see if goal is reached
