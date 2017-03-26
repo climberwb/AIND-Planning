@@ -586,14 +586,18 @@ class PlanningGraph():
   
         # self.problem.tell(decode_state(problem.ini, self.problem.state_map).pos_sentence())
     
-        pos = [ self.problem.state_map[i] for i,init in enumerate(self.problem.initial) if init == "T"]
-        neg = [ self.problem.state_map[i] for i,init in enumerate(self.problem.initial) if init == "F"]
+       
+        
         for goal in self.problem.goal:
-            if goal in pos:
-                continue
-            else:
-                for action in self.problem.actions_list:
-                    if goal in action.effect_add:
-                        level_sum+=1
-                        continue
+            for i,level in enumerate(self.s_levels):
+                pos_lits = [literal.symbol for literal in level if literal.is_pos]
+                neg_lits = [literal.symbol for literal in level if literal.is_pos == False]
+                if i ==0:
+                    if goal in pos_lits:
+                        break
+                else:
+                    level_sum+=1
+                    if goal in pos_lits:
+                        break    
+                
         return level_sum
