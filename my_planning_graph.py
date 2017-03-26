@@ -533,7 +533,10 @@ class PlanningGraph():
         :return: bool
         '''
         # TODO test for negation between nodes
-        return False
+        s1,p1 = node_s1.symbol,node_s1.is_pos
+        s2,p2 = node_s2.symbol,node_s2.is_pos
+        not_p2 = not p2
+        return s1 == s2 and p1 == not_p2
 
     def inconsistent_support_mutex(self, node_s1: PgNode_s, node_s2: PgNode_s):
         '''
@@ -551,8 +554,26 @@ class PlanningGraph():
         :param node_s2: PgNode_s
         :return: bool
         '''
-        # TODO test for Inconsistent Support between nodes
-        return False
+        pos = set()
+        neg = set()
+        if node_s1.is_pos:
+            pos.add(node_s1.symbol)
+        else:
+            neg.add(node_s1.symbol)
+        if node_s2.is_pos:
+            pos.add(node_s2.symbol)
+        else:
+            neg.add(node_s2.symbol)
+        
+        for p1 in node_s1.parents:
+            for p2 in node_s2.parents:
+                parent_satisfies_literals =  ( set(p1.action.effect_add) == pos and set(p1.action.effect_rem) == neg ) or  (set(p2.action.effect_add) == pos and set(p2.action.effect_rem)== neg) 
+
+                if  parent_satisfies_literals:
+                    return   False
+
+        return self.competing_needs_mutex(node_s1,node_s2) 
+        # return False
 
     def h_levelsum(self) -> int:
         '''The sum of the level costs of the individual goals (admissible if goals independent)
@@ -560,6 +581,19 @@ class PlanningGraph():
         :return: int
         '''
         level_sum = 0
-        # TODO implement
+       
         # for each goal in the problem, determine the level cost, then add them together
+  
+        # self.problem.tell(decode_state(problem.ini, self.problem.state_map).pos_sentence())
+    
+        pos = [ self.problem.state_map[i] for i,init in enumerate(self.problem.initial) if init == "T"]
+        neg = [ self.problem.state_map[i] for i,init in enumerate(self.problem.initial) if init == "F"]
+        for goal in self.problem.goal:
+            if goal in pos:
+                continue
+            else:
+                for action in self.problem.actions_list:
+                    if goal in action.effect_add:
+                        level_sum+=1
+                        continue
         return level_sum
