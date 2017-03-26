@@ -591,7 +591,6 @@ class PlanningGraph():
         for goal in self.problem.goal:
             for i,level in enumerate(self.s_levels):
                 pos_lits = [literal.symbol for literal in level if literal.is_pos]
-                neg_lits = [literal.symbol for literal in level if literal.is_pos == False]
                 if i ==0:
                     if goal in pos_lits:
                         break
