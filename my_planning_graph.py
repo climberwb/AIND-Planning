@@ -438,7 +438,14 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         '''
-        # TODO test for Inconsistent Effects between nodes
+        a1_pos = set(node_a1.action.effect_add)
+        a1_neg = set(node_a1.action.effect_rem)
+        a2_pos = set(node_a2.action.effect_add)
+        a2_neg = set(node_a2.action.effect_rem)
+        set1_check = len(a1_pos) >0  and len(a2_neg)>0
+        set2_check = len(a2_pos) >0  and len(a1_neg)>0
+        if (a1_pos.intersection(a2_neg) != set() and set1_check)  or  (a1_neg.intersection(a2_pos) != set() and set2_check):
+            return True
         return False
 
     def interference_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
@@ -455,7 +462,24 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         '''
-        # TODO test for Interference between nodes
+        a1_pre_pos =  set(node_a1.action.precond_pos)  
+        a1_pre_neg = set(node_a1.action.precond_neg)
+
+        a2_pre_pos =  set(node_a2.action.precond_pos)  
+        a2_pre_neg = set(node_a2.action.precond_neg)
+
+        a1_pos = set(node_a1.action.effect_add)
+        a1_neg = set(node_a1.action.effect_rem)
+        a2_pos = set(node_a2.action.effect_add)
+        a2_neg = set(node_a2.action.effect_rem)
+
+
+        if a1_pos.intersection(a1_pre_neg) != set() or\
+           a2_pos.intersection(a2_pre_neg) != set() or \
+           a1_neg.intersection(a2_pre_pos) != set() or \
+           a2_neg.intersection(a1_pre_pos) != set():
+            return True
+
         return False
 
     def competing_needs_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
@@ -469,7 +493,11 @@ class PlanningGraph():
         :return: bool
         '''
 
-        # TODO test for Competing Needs between nodes
+        for n in node_a1.parents:
+            for j in node_a2.parents:
+                if n.is_mutex(j):
+                    return True
+
         return False
 
     def update_s_mutex(self, nodeset: set):
