@@ -219,29 +219,16 @@ class AirCargoProblem(Problem):
         kb = PropKB()
         kb.tell(decode_state(node.state, self.state_map).pos_sentence())
         # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
-        counts=[]
-        count = 0
-        actions = set()
-        literals = set()
-        for clause in kb.clauses:
-            if clause in self.goal:
-                literals.add(clause)
+        count=0
+        set_til_goal = set(kb.clauses).intersection(set(self.goal))
+
         for action in self.actions_list:
-            for action2 in self.actions_list:
-                if action == action2:
-                    continue
-                for lit_goal in self.goal:
-                    if lit_goal in action2.effect_add:
-                        if lit_goal not in literals: 
-                            literals.add(lit_goal)
-                            count+=1
-                if len(literals) == len(self.goal):
-                    literals=set()
-                    counts.append(count)
-                    count = 0
-                    continue
-        if len(counts) > 0:
-            count = sorted(counts)[0]
+            literals_in_common_with_goal = set(action.effect_add).intersection(set(self.goal))
+            if  literals_in_common_with_goal !=set() and literals_in_common_with_goal.intersection(set_til_goal) == set():
+                set_til_goal = set_til_goal.union(literals_in_common_with_goal)
+                count +=1
+                if(set_til_goal == set(self.goal)):
+                    break
         return count
 
 
